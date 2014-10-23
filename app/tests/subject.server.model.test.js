@@ -42,10 +42,23 @@ describe('Subject Model Unit Tests:', function() {
             });
         });
         it('should be able to show an error when try to save new subject with same name', function(done) {
-            subject = new Subject({
-                name: 'Subject name',
-                user: user
+            subject.save(function(err) {
+                should.not.exist(err);
+
+                var newSubject = new Subject({
+                    name: 'Subject name',
+                    user: user
+                });
+
+                return newSubject.save(function(err) {
+                    should.exist(err);
+                    done();
+                });
             });
+        });
+
+        it('should be able to show an error when try to save subject without name', function(done) {
+            subject.name = '';
 
             return subject.save(function(err) {
                 should.exist(err);
@@ -53,8 +66,9 @@ describe('Subject Model Unit Tests:', function() {
             });
         });
 
-        it('should be able to show an error when try to save without name', function(done) {
-            subject.name = '';
+
+        it('should be able to show an error when try to save subject without user', function(done) {
+            subject.user = '';
 
             return subject.save(function(err) {
                 should.exist(err);

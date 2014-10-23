@@ -88,7 +88,7 @@ exports.list = function(req, res) {
  * Rating middleware
  */
 exports.ratingByID = function(req, res, next, id) {
-    Rating.findById(id).populate('user', 'displayName').exec(function(err, rating) {
+    Rating.findById(id).populate('user', 'username').exec(function(err, rating) {
         if (err) return next(err);
         if (!rating) return next(new Error('Failed to load rating ' + id));
         req.rating = rating;

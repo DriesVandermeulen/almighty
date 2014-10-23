@@ -51,6 +51,10 @@ ApplicationConfiguration.registerModule('articles');
 ApplicationConfiguration.registerModule('core');
 'use strict';
 
+// Use applicaion configuration module to register a new module
+ApplicationConfiguration.registerModule('ratings');
+'use strict';
+
 // Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('users');
 
@@ -373,6 +377,100 @@ angular.module('core').service('Menus', [
 ]);
 'use strict';
 
+// Configuring the Articles module
+angular.module('ratings').run(['Menus',
+    function(Menus) {
+        // Set top bar menu items
+        Menus.addMenuItem('topbar', 'Ratings', 'ratings', '/ratings');
+    }
+]);
+'use strict';
+
+// Setting up route
+angular.module('ratings').config(['$stateProvider',
+    function($stateProvider) {
+        // Ratings state routing
+        $stateProvider.
+            state('ratings', {
+                url: '/ratings',
+                templateUrl: 'modules/ratings/views/ratings.client.view.html'
+            });
+    }
+]);
+'use strict';
+
+angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Ratings',
+    function($scope, $stateParams, $location, Authentication, Ratings) {
+        $scope.authentication = Authentication;
+
+        $scope.create = function() {
+            var rating = new Ratings({
+                title: this.title,
+                content: this.content
+            });
+            rating.$save(function(response) {
+                $location.path('ratings/' + response._id);
+
+                $scope.title = '';
+                $scope.content = '';
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
+
+        $scope.remove = function(rating) {
+            if (rating) {
+                rating.$remove();
+
+                for (var i in $scope.ratings) {
+                    if ($scope.ratings[i] === rating) {
+                        $scope.ratings.splice(i, 1);
+                    }
+                }
+            } else {
+                $scope.rating.$remove(function() {
+                    $location.path('ratings');
+                });
+            }
+        };
+
+        $scope.update = function() {
+            var rating = $scope.rating;
+
+            rating.$update(function() {
+                $location.path('ratings/' + rating._id);
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
+        };
+
+        $scope.find = function() {
+            $scope.ratings = Rating.query();
+        };
+
+        $scope.findOne = function() {
+            $scope.rating = Rating.get({
+                ratingId: $stateParams.ratingId
+            });
+        };
+    }
+]);
+'use strict';
+
+//Ratings service used for communicating with the rating REST endpoints
+angular.module('ratings').factory('Ratings', ['$resource',
+    function($resource) {
+        return $resource('ratings/:ratingId', {
+            ratingId: '@_id'
+        }, {
+            update: {
+                method: 'PUT'
+            }
+        });
+    }
+]);
+'use strict';
+
 // Config HTTP Error Handling
 angular.module('users').config(['$httpProvider',
 	function($httpProvider) {
@@ -415,10 +513,6 @@ angular.module('users').config(['$stateProvider',
 		state('password', {
 			url: '/settings/password',
 			templateUrl: 'modules/users/views/settings/change-password.client.view.html'
-		}).
-		state('accounts', {
-			url: '/settings/accounts',
-			templateUrl: 'modules/users/views/settings/social-accounts.client.view.html'
 		}).
 		state('signup', {
 			url: '/signup',

@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	db: 'mongodb://dries.local/almighty-dev',
+	db: 'mongodb://localhost/almighty-dev',
 	app: {
 		title: 'almighty - Development Environment'
 	},
@@ -12,7 +12,7 @@ module.exports = {
 	},
 	twitter: {
 		clientID: process.env.TWITTER_KEY || 'CONSUMER_KEY',
-		clientSecret: process.env.TWITTER_SECRET || 'CONSUMER_SECRET',
+		clientSecret: process.env.TsWITTER_SECRET || 'CONSUMER_SECRET',
 		callbackURL: 'http://localhost:3000/auth/twitter/callback'
 	},
 	google: {

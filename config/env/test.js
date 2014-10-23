@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	db: 'mongodb://dries.local/almighty-test',
+	db: 'mongodb://localhost/almighty-test',
 	port: 3001,
 	app: {
 		title: 'almighty - Test Environment'

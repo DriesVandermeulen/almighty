@@ -88,7 +88,7 @@ exports.list = function(req, res) {
  * Subject middleware
  */
 exports.subjectByID = function(req, res, next, id) {
-    Subject.findById(id).populate('user', 'displayName').exec(function(err, subject) {
+    Subject.findById(id).populate('user', 'username').exec(function(err, subject) {
         if (err) return next(err);
         if (!subject) return next(new Error('Failed to load subject ' + id));
         req.subject = subject;
