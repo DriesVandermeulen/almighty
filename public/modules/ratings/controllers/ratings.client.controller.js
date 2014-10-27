@@ -4,11 +4,14 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
     function($scope, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
+        $scope.error = 'No error';
 
         $scope.createNewRating = function(){
+
             var newSubject = new Api.Subjects({
                 name: $scope.name
             });
+
             $scope.name = '';
 
             newSubject.$save(function(response) {
@@ -23,7 +26,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
                 $scope.comment = '';
 
                 newRating.$save(function(response) {
-                    $scope.error = 'Success';
+                    $scope.error = 'success';
                 }, function(errorResponse) {
                     $scope.error = errorResponse.data.message;
                 });

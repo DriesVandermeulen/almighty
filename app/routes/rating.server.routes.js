@@ -9,14 +9,14 @@ var users = require('../../app/controllers/users.server.controller'),
 module.exports = function(app) {
     // Ratings Routes
     app.route('/ratings')
-        .get(users.requiresLogin, ratings.list)
-        .post(users.requiresLogin, ratings.create);
+        .get(users.requiresLogin, ratings.REST.getAll)
+        .post(users.requiresLogin, ratings.REST.create);
 
     app.route('/ratings/:ratingId')
-        .get(users.requiresLogin, ratings.read)
-        .put(users.requiresLogin, ratings.hasAuthorization, ratings.update)
-        .delete(users.requiresLogin, ratings.hasAuthorization, ratings.delete);
+        .get(users.requiresLogin, ratings.REST.read)
+        .put(users.requiresLogin, ratings.REST.checkAuthorization, ratings.REST.update)
+        .delete(users.requiresLogin, ratings.REST.checkAuthorization, ratings.REST.remove);
 
     // Finish by binding the rating middleware
-    app.param('ratingId', ratings.ratingByID);
+    app.param('ratingId', ratings.REST.getById);
 };

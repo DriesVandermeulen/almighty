@@ -8,14 +8,62 @@ var mongoose = require('mongoose'),
     Rating = mongoose.model('Rating'),
     _ = require('lodash');
 
-/**
- * Create a rating
- */
-exports.create = function(req, res) {
-    var rating = new Rating(req.body);
-    rating.user = req.user;
+var create = function(type, comment, subject, user, callback){
+
+    var rating = new Rating();
+    rating.type = type;
+    rating.comment = comment;
+    rating.subject = subject;
+    rating.user = user;
+
 
     rating.save(function(err) {
+        callback(err, rating);
+    });
+};
+
+var update = function(rating, callback) {
+    rating.save(function(err) {
+        callback(err, rating);
+    });
+};
+
+var remove = function(rating, callback) {
+
+    rating.remove(function(err) {
+        callback(err, rating);
+    });
+};
+
+var getAll = function(callback){
+    Rating
+        .find()
+        .populate('user', 'username')
+        .exec(function(err, ratings) {
+            callback(err, ratings);
+        });
+};
+
+var getById = function(id, callback){
+    Rating
+        .findById(id)
+        .populate('user', 'username')
+        .exec(function(err, ratings) {
+            callback(err, ratings);
+        });
+};
+
+var checkAuthorization = function(user, rating) {
+    return (user.id !== rating.user.id);
+};
+
+var createREST = function(req, res) {
+    var type = req.body.type;
+    var comment = req.body.comment;
+    var subject = req.body.subject;
+    var user = req.user;
+
+    create(type, comment, subject, user, function(err, rating) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -26,22 +74,12 @@ exports.create = function(req, res) {
     });
 };
 
-/**
- * Show the current rating
- */
-exports.read = function(req, res) {
-    res.jsonp(req.rating);
-};
-
-/**
- * Update a rating
- */
-exports.update = function(req, res) {
+var updateREST = function(req, res) {
     var rating = req.rating;
 
     rating = _.extend(rating, req.body);
 
-    rating.save(function(err) {
+    update(rating, function(err, rating) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -52,13 +90,10 @@ exports.update = function(req, res) {
     });
 };
 
-/**
- * Delete an rating
- */
-exports.delete = function(req, res) {
+var removeREST = function(req, res) {
     var rating = req.rating;
 
-    rating.remove(function(err) {
+    remove(rating, function(err, rating) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -69,11 +104,12 @@ exports.delete = function(req, res) {
     });
 };
 
-/**
- * List of Ratings
- */
-exports.list = function(req, res) {
-    Rating.find().sort('-created').populate('user', 'email').exec(function(err, ratings) {
+var readREST = function(req, res) {
+    res.jsonp(req.rating);
+};
+
+var getAllREST = function(req, res) {
+    getAll(function(err, ratings) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -84,26 +120,43 @@ exports.list = function(req, res) {
     });
 };
 
-/**
- * Rating middleware
- */
-exports.ratingByID = function(req, res, next, id) {
-    Rating.findById(id).populate('user', 'username').exec(function(err, rating) {
-        if (err) return next(err);
-        if (!rating) return next(new Error('Failed to load rating ' + id));
+var getByIdREST = function(req, res, next, id) {
+    getById(id, function(err, rating) {
+        if (err) {
+            return next(err);
+        }
+        if (!rating) {
+            return next(new Error('Failed to load subject ' + id));
+        }
         req.rating = rating;
         next();
     });
 };
 
-/**
- * Rating authorization middleware
- */
-exports.hasAuthorization = function(req, res, next) {
-    if (req.rating.user.id !== req.user.id) {
+
+var checkAuthorizationREST = function(req, res, next) {
+    if (checkAuthorization(req.user, req.rating)) {
         return res.status(403).send({
             message: 'User is not authorized'
         });
     }
     next();
+};
+
+module.exports = {
+    REST:{
+        create: createREST,
+        update: updateREST,
+        remove: removeREST,
+        read: readREST,
+        getAll: getAllREST,
+        getById: getByIdREST,
+        checkAuthorization: checkAuthorizationREST
+    },
+    create: create,
+    update: update,
+    remove: remove,
+    getAll: getAll,
+    getById: getById,
+    checkAuthorization: checkAuthorization
 };

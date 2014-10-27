@@ -66,6 +66,15 @@ describe('Subject Model Unit Tests:', function() {
             });
         });
 
+        it('should be able to show an error when try to save subject with name shorter than 3 characters', function(done) {
+            subject.name = '12';
+
+            return subject.save(function(err) {
+                should.exist(err);
+                done();
+            });
+        });
+
 
         it('should be able to show an error when try to save subject without user', function(done) {
             subject.user = '';

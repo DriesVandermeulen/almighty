@@ -8,6 +8,57 @@ var mongoose = require('mongoose'),
     Subject = mongoose.model('Subject'),
     _ = require('lodash');
 
+var create = function(name, user, callback){
+
+    var subject = new Subject();
+    subject.name = name;
+    subject.user = user;
+
+    subject.save(function(err) {
+        callback(err, subject);
+    });
+};
+
+var update = function(subject, callback) {
+    subject.save(function(err) {
+        callback(err, subject);
+    });
+};
+
+var remove = function(subject, callback) {
+
+    subject.remove(function(err) {
+        callback(err, subject);
+    });
+};
+
+var getAll = function(callback){
+    Subject
+        .find()
+        .exec(function(err, subjects) {
+            callback(err, subjects);
+        });
+};
+
+var getById = function(id, callback){
+    Subject
+        .findById(id)
+        .exec(function(err, subject) {
+            callback(err, subject);
+        });
+};
+
+var getByName = function(name, callback){
+    Subject
+        .findOne({name: name}, '_id')
+        .exec(function(err, subject) {
+            callback(err, subject);
+        });
+};
+
+var checkAuthorization = function(user, subject) {
+    return (user.id !== subject.user.id);
+};
 
 var createREST = function(req, res) {
 
@@ -90,7 +141,7 @@ var getByNameREST = function(req, res, next, name) {
             return next(err);
         }
         if (!subject) {
-            return next(new Error('Failed to load subject ' + id));
+            return next(new Error('Failed to load subject ' + name));
         }
         req.subject = subject;
         next();
@@ -106,64 +157,11 @@ var checkAuthorizationREST = function(req, res, next) {
     next();
 };
 
-var create = function(name, user, callback){
-
-    var subject = new Subject();
-    subject.name = name;
-    subject.user = user;
-
-    subject.save(function(err) {
-        callback(err, subject)
-    });
-};
-
-var update = function(subject, callback) {
-    subject.save(function(err) {
-        callback(err, subject);
-    });
-};
-
-var remove = function(subject, callback) {
-
-    subject.remove(function(err) {
-        callback(err, subject)
-    });
-};
-
-var getAll = function(callback){
-    Subject
-        .find()
-        .exec(function(err, subjects) {
-            callback(err, subjects)
-        });
-};
-
-var getById = function(id, callback){
-    Subject
-        .findById(id)
-        .exec(function(err, subject) {
-            callback(err, subject)
-        });
-};
-
-var getByName = function(name, callback){
-    Subject
-        .findOne({name: name}, '_id')
-        .exec(function(err, subject) {
-            callback(err, subject)
-        });
-};
-
-var checkAuthorization = function(user, subject) {
-    return (user.id !== subject.user.id);
-};
-
-
 module.exports = {
     REST:{
         create: createREST,
         update: updateREST,
-        delete: removeREST,
+        remove: removeREST,
         read: readREST,
         getAll: getAllREST,
         getById: getByIdREST,

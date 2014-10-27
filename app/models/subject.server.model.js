@@ -7,6 +7,17 @@ var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
 
 /**
+ * Validate lenght
+ */
+var validateSubjectName = function(name) {
+    if(name){
+        return (name.length > 2);
+    } else{
+        return true;
+    }
+};
+
+/**
  * Subject Schema
  */
 var SubjectSchema = new Schema({
@@ -14,7 +25,10 @@ var SubjectSchema = new Schema({
         type: String,
         trim: true,
         required: 'Please enter a name',
-        unique:true
+        unique:true,
+        validate: [
+            { validator: validateSubjectName, msg: 'Name must be at least 3 characters long' }
+        ]
     },
     user: {
         type: Schema.ObjectId,
