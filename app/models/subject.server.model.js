@@ -13,7 +13,7 @@ var SubjectSchema = new Schema({
     name: {
         type: String,
         trim: true,
-        required: 'Please enter a subject',
+        required: 'Please enter a name',
         unique:true
     },
     user: {

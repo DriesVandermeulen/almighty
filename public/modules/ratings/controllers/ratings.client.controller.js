@@ -1,19 +1,33 @@
 'use strict';
 
-angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Ratings',
-    function($scope, $stateParams, $location, Authentication, Ratings) {
+angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location','Authentication', 'Api',
+    function($scope, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
-        $scope.create = function() {
-            var rating = new Ratings({
-                title: this.title,
-                content: this.content
-            });
-            rating.$save(function(response) {
-                $location.path('ratings/' + response._id);
 
-                $scope.title = '';
-                $scope.content = '';
+        $scope.createNewRating = function(){
+            var newSubject = new Api.Subjects({
+                name: $scope.name
+            });
+            $scope.name = '';
+
+            newSubject.$save(function(response) {
+
+                var newRating = new Api.Ratings({
+                    type: $scope.type,
+                    comment:  $scope.comment,
+                    subject:  response._id
+                });
+
+                $scope.type = '';
+                $scope.comment = '';
+
+                newRating.$save(function(response) {
+                    $scope.error = 'Success';
+                }, function(errorResponse) {
+                    $scope.error = errorResponse.data.message;
+                });
+
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
             });
@@ -46,13 +60,17 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
         };
 
         $scope.find = function() {
-            $scope.ratings = Ratings.query();
+            $scope.ratings = Api.Ratings.query();
         };
 
         $scope.findOne = function() {
-            $scope.rating = Ratings.get({
+            $scope.rating = Api.Ratings.get({
                 ratingId: $stateParams.ratingId
             });
+        };
+
+        $scope.getAllSubject = function() {
+            $scope.subjects = Api.Subjects.query();
         };
     }
 ]);
