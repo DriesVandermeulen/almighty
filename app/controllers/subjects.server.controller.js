@@ -8,40 +8,29 @@ var mongoose = require('mongoose'),
     Subject = mongoose.model('Subject'),
     _ = require('lodash');
 
-/**
- * Create a subject
- */
-exports.create = function(req, res) {
-    var subject = new Subject(req.body);
-    subject.user = req.user;
 
-    subject.save(function(err) {
+var createREST = function(req, res) {
+
+    var name = req.body.name;
+    var user = req.user;
+
+    create(name, user, function(err, subject){
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
             });
-        } else {
+        }else{
             res.jsonp(subject);
         }
     });
 };
 
-/**
- * Show the current subject
- */
-exports.read = function(req, res) {
-    res.jsonp(req.subject);
-};
-
-/**
- * Update a subject
- */
-exports.update = function(req, res) {
+var updateREST = function(req, res) {
     var subject = req.subject;
 
     subject = _.extend(subject, req.body);
 
-    subject.save(function(err) {
+    update(subject, function(err, subject) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -52,13 +41,10 @@ exports.update = function(req, res) {
     });
 };
 
-/**
- * Delete a subject
- */
-exports.delete = function(req, res) {
+var removeREST = function(req, res) {
     var subject = req.subject;
 
-    subject.remove(function(err) {
+    remove(subject, function(err, subject) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -69,11 +55,12 @@ exports.delete = function(req, res) {
     });
 };
 
-/**
- * List of subjects
- */
-exports.list = function(req, res) {
-    Subject.find().exec(function(err, subjects) {
+var readREST = function(req, res) {
+    res.jsonp(req.subject);
+};
+
+var getAllREST = function(req, res) {
+    getAll(function(err, subjects) {
         if (err) {
             return res.status(400).send({
                 message: errorHandler.getErrorMessage(err)
@@ -84,26 +71,110 @@ exports.list = function(req, res) {
     });
 };
 
-/**
- * Subject middleware
- */
-exports.subjectByID = function(req, res, next, id) {
-    Subject.findById(id).populate('user', 'username').exec(function(err, subject) {
-        if (err) return next(err);
-        if (!subject) return next(new Error('Failed to load subject ' + id));
+var getByIdREST = function(req, res, next, id) {
+    getById(id, function(err, subject) {
+        if (err) {
+            return next(err);
+        }
+        if (!subject) {
+            return next(new Error('Failed to load subject ' + id));
+        }
         req.subject = subject;
         next();
     });
 };
 
-/**
- * Subject authorization middleware
- */
-exports.hasAuthorization = function(req, res, next) {
-    if (req.subject.user.id !== req.user.id) {
+var getByNameREST = function(req, res, next, name) {
+    getByName(name, function(err, subject) {
+        if (err) {
+            return next(err);
+        }
+        if (!subject) {
+            return next(new Error('Failed to load subject ' + id));
+        }
+        req.subject = subject;
+        next();
+    });
+};
+
+var checkAuthorizationREST = function(req, res, next) {
+    if (checkAuthorization(req.user, req.subject)) {
         return res.status(403).send({
             message: 'User is not authorized'
         });
     }
     next();
+};
+
+var create = function(name, user, callback){
+
+    var subject = new Subject();
+    subject.name = name;
+    subject.user = user;
+
+    subject.save(function(err) {
+        callback(err, subject)
+    });
+};
+
+var update = function(subject, callback) {
+    subject.save(function(err) {
+        callback(err, subject);
+    });
+};
+
+var remove = function(subject, callback) {
+
+    subject.remove(function(err) {
+        callback(err, subject)
+    });
+};
+
+var getAll = function(callback){
+    Subject
+        .find()
+        .exec(function(err, subjects) {
+            callback(err, subjects)
+        });
+};
+
+var getById = function(id, callback){
+    Subject
+        .findById(id)
+        .exec(function(err, subject) {
+            callback(err, subject)
+        });
+};
+
+var getByName = function(name, callback){
+    Subject
+        .findOne({name: name}, '_id')
+        .exec(function(err, subject) {
+            callback(err, subject)
+        });
+};
+
+var checkAuthorization = function(user, subject) {
+    return (user.id !== subject.user.id);
+};
+
+
+module.exports = {
+    REST:{
+        create: createREST,
+        update: updateREST,
+        delete: removeREST,
+        read: readREST,
+        getAll: getAllREST,
+        getById: getByIdREST,
+        getByName: getByNameREST,
+        checkAuthorization: checkAuthorizationREST
+    },
+    create: create,
+    update: update,
+    remove: remove,
+    getAll: getAll,
+    getById: getById,
+    getByName: getByName,
+    checkAuthorization: checkAuthorization
 };
