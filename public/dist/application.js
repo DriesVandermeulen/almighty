@@ -399,20 +399,34 @@ angular.module('ratings').config(['$stateProvider',
 ]);
 'use strict';
 
-angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location', 'Authentication', 'Ratings',
-    function($scope, $stateParams, $location, Authentication, Ratings) {
+angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location','Authentication', 'Api',
+    function($scope, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
-        $scope.create = function() {
-            var rating = new Ratings({
-                title: this.title,
-                content: this.content
-            });
-            rating.$save(function(response) {
-                $location.path('ratings/' + response._id);
 
-                $scope.title = '';
-                $scope.content = '';
+        $scope.createNewRating = function(){
+            var newSubject = new Api.Subjects({
+                name: $scope.name
+            });
+            $scope.name = '';
+
+            newSubject.$save(function(response) {
+
+                var newRating = new Api.Ratings({
+                    type: $scope.type,
+                    comment:  $scope.comment,
+                    subject:  response._id
+                });
+
+                $scope.type = '';
+                $scope.comment = '';
+
+                newRating.$save(function(response) {
+                    $scope.error = 'Success';
+                }, function(errorResponse) {
+                    $scope.error = errorResponse.data.message;
+                });
+
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
             });
@@ -445,28 +459,18 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
         };
 
         $scope.find = function() {
-            $scope.ratings = Rating.query();
+            $scope.ratings = Api.Ratings.query();
         };
 
         $scope.findOne = function() {
-            $scope.rating = Rating.get({
+            $scope.rating = Api.Ratings.get({
                 ratingId: $stateParams.ratingId
             });
         };
-    }
-]);
-'use strict';
 
-//Ratings service used for communicating with the rating REST endpoints
-angular.module('ratings').factory('Ratings', ['$resource',
-    function($resource) {
-        return $resource('ratings/:ratingId', {
-            ratingId: '@_id'
-        }, {
-            update: {
-                method: 'PUT'
-            }
-        });
+        $scope.getAllSubject = function() {
+            $scope.subjects = Api.Subjects.query();
+        };
     }
 ]);
 'use strict';
@@ -550,15 +554,19 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 		if ($scope.authentication.user) $location.path('/');
 
 		$scope.signup = function() {
-			$http.post('/auth/signup', $scope.credentials).success(function(response) {
-				// If successful we assign the response to the global user model
-				$scope.authentication.user = response;
 
-				// And redirect to the index page
-				$location.path('/');
-			}).error(function(response) {
-				$scope.error = response.message;
-			});
+                if(validateCredential()){
+                    $scope.credentials.confirmPassword = undefined;
+                    $http.post('/auth/signup', $scope.credentials).success(function (response) {
+                        // If successful we assign the response to the global user model
+                        $scope.authentication.user = response;
+
+                        // And redirect to the index page
+                        $location.path('/');
+                    }).error(function (response) {
+                        $scope.error = response.message;
+                    });
+                }
 		};
 
 		$scope.signin = function() {
@@ -572,6 +580,32 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 				$scope.error = response.message;
 			});
 		};
+
+        function validateCredential(){
+            if(! $scope.credentials){
+                $scope.error = 'Pleas fill in the required credentials.';
+                return false;
+            }
+            else if(!$scope.credentials.username ||  $scope.credentials.username === ''){
+                $scope.error = 'Pleas fill in a username.';
+                return false;
+            }
+            else if(!$scope.credentials.email ||  $scope.credentials.email === ''){
+                $scope.error = 'Pleas fill in an email address.';
+                return false;
+            }
+            else if((!$scope.credentials.password ||  $scope.credentials.password === '') || (!$scope.credentials.confirmPassword ||  $scope.credentials.confirmPassword === '')){
+                $scope.error = 'Pleas fill in a password.';
+                return false;
+            }
+            else if( $scope.credentials.password !==  $scope.credentials.confirmPassword){
+                $scope.error = 'Passwords do not match.';
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
 	}
 ]);
 'use strict';

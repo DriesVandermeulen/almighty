@@ -15,12 +15,12 @@ module.exports = function(app) {
     app.route('/subjects/:subjectId')
         .get(users.requiresLogin, subjects.REST.read)
         .put(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.update)
-        .delete(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.delete);
+        .delete(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.remove);
 
     app.route('/subjects/:subjectName')
         .get(users.requiresLogin, subjects.REST.read)
         .put(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.update)
-        .delete(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.delete);
+        .delete(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.remove);
 
     // Finish by binding the subject middleware
     app.param('subjectId', subjects.REST.getById);
