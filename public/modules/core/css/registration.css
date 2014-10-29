@@ -1,0 +1,52 @@
+/*Registration and Login
+------------------------------------*/
+
+.reg-page {
+    color: #555;
+    padding: 30px;
+    background: #fff;
+    border: solid 1px #eee;
+    box-shadow: 0 0 3px #eee;
+}
+
+.reg-page-error {
+    background: #f2dede;
+    border: solid 1px #ebccd1;
+}
+
+.reg-page-error > .reg-header {
+    border-bottom: solid 1px #ebccd1;
+}
+
+.reg-page-success {
+    background: #dff0d8;
+    border: solid 1px #d6e9c6;
+}
+
+.reg-page-success > .reg-header {
+    border-bottom: solid 1px #d6e9c6;
+}
+
+.reg-header {
+    text-align: center;
+    margin-bottom: 35px;
+    border-bottom: solid 1px #eee;
+}
+
+.reg-header h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.reg-footer {
+    text-align: center;
+}
+
+.reg-logo {
+    vertical-align: baseline;
+    width: 27px;
+    height: 27px;
+    margin-left: 15px;
+}
+
+
