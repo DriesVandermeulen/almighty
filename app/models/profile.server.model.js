@@ -9,7 +9,7 @@ var mongoose = require('mongoose'),
 /**
  * Profile Schema
  */
-var ProfileSchema = new Profile({
+var ProfileSchema = new Schema({
     credits: {
         best: {
             type: Number,
@@ -30,8 +30,9 @@ var ProfileSchema = new Profile({
     },
     user: {
         type: Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: 'User cannot be blank'
     }
 });
 
-mongoose.model('Article', ProfileSchema);
+mongoose.model('Profile', ProfileSchema);

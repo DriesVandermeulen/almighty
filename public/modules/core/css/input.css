@@ -23,15 +23,18 @@
     background: #B8AE9C;
     display: inline-block;
     text-decoration: none;
+    font-weight:bold;
 }
 
 .btn-a:hover {
     color: #fff;
     text-decoration: none;
-    -webkit-transition: all 0.3s ease-in-out;
-    -moz-transition: all 0.3s ease-in-out;
-    -o-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
+}
+
+.btn-a-big {
+    font-size: 16px;
+    font-weight: 800;
+    padding: 20px 20px;
 }
 
 .btn-a-legendary {
