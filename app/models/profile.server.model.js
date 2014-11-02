@@ -30,7 +30,8 @@ var ProfileSchema = new Schema({
     },
     user: {
         type: Schema.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: 'User cannot be blank'
     }
 });
 

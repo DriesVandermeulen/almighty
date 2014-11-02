@@ -50,7 +50,7 @@ var getById = function(id, callback){
 
 var getByName = function(name, callback){
     Subject
-        .findOne({name: name}, '_id')
+        .findOne({name: name})
         .exec(function(err, subject) {
             callback(err, subject);
         });

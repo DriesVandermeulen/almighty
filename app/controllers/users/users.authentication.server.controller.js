@@ -5,10 +5,10 @@
  */
 var _ = require('lodash'),
 	errorHandler = require('../errors.server.controller'),
+    profiles = require('../profiles.server.controller'),
 	mongoose = require('mongoose'),
 	passport = require('passport'),
-	User = mongoose.model('User'),
-    Profile = mongoose.model('Profile');
+	User = mongoose.model('User');
 
 /**
  * Signup
@@ -35,14 +35,7 @@ exports.signup = function(req, res) {
 			user.password = undefined;
 			user.salt = undefined;
 
-            var profile = new Profile();
-            profile.credits.best = 5;
-            profile.credits.good = 15;
-            profile.credits.bad = 15;
-            profile.credits.worst = 5;
-            profile.user = user;
-
-            profile.save(function(err) {
+            profiles.create(user ,function(err) {
                 if (err) {
                     return res.status(400).send({
                         message: errorHandler.getErrorMessage(err)

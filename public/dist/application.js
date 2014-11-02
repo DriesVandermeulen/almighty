@@ -184,11 +184,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 ]);
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus',
-	function($scope, Authentication, Menus) {
+angular.module('core').controller('HeaderController', ['$scope', '$stateParams', '$location', 'Authentication', 'Api',
+	function($scope, $stateParams, $location, Authentication, Api) {
 		$scope.authentication = Authentication;
 		$scope.isCollapsed = false;
-		$scope.menu = Menus.getMenu('topbar');
 
 		$scope.toggleCollapsibleMenu = function() {
 			$scope.isCollapsed = !$scope.isCollapsed;
@@ -198,6 +197,14 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		$scope.$on('$stateChangeSuccess', function() {
 			$scope.isCollapsed = false;
 		});
+
+        $scope.getProfile = function() {
+            if($scope.authentication.user){
+                $scope.profile = Api.Profile.get({
+                    profileId: $scope.authentication.user
+                });
+            }
+        };
 	}
 ]);
 'use strict';
@@ -380,8 +387,6 @@ angular.module('core').service('Menus', [
 // Configuring the Articles module
 angular.module('ratings').run(['Menus',
     function(Menus) {
-        // Set top bar menu items
-        Menus.addMenuItem('topbar', 'Ratings', 'ratings', '/ratings');
     }
 ]);
 'use strict';
@@ -403,11 +408,14 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
     function($scope, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
+        $scope.error = 'No error';
 
         $scope.createNewRating = function(){
+
             var newSubject = new Api.Subjects({
                 name: $scope.name
             });
+
             $scope.name = '';
 
             newSubject.$save(function(response) {
@@ -422,7 +430,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
                 $scope.comment = '';
 
                 newRating.$save(function(response) {
-                    $scope.error = 'Success';
+                    $scope.error = 'success';
                 }, function(errorResponse) {
                     $scope.error = errorResponse.data.message;
                 });
@@ -470,6 +478,19 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
 
         $scope.getAllSubject = function() {
             $scope.subjects = Api.Subjects.query();
+        };
+    }
+]);
+'use strict';
+
+//Ratings service used for communicating with the rating REST endpoints
+angular.module('ratings').factory('Api', ['$resource',
+    function($resource) {
+
+        return {
+            Ratings: $resource('ratings/:ratingId', {ratingId: '@_id'}, {update: {method: 'PUT'}}),
+            Subjects:  $resource('subjects/:subjectId', {subjectId: '@_id'},{update: {method: 'PUT'}}),
+            Profiles:  $resource('profiles/:profileId', {profileId: '@_id'},{update: {method: 'PUT'}})
         };
     }
 ]);

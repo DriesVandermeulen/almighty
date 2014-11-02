@@ -1,3 +1,24 @@
-<div class="header" data-ng-controller="HeaderController" data-ng-show="authentication.user">
+<div class="header elevated" data-ng-controller="HeaderController" data-ng-show="authentication.user">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="logo">
+                <img src="modules/core/img/brand/cloud.svg">
+            </div>
+        </div>
+        <div class="col-md-4 header-menu">
+            <div class="menu-item">
+                <a href="#"><span class="icon glyphicon glyphicon-plus"></span></a>
+            </div>
+            <div class="menu-item">
+                <a href="#"><span class="icon glyphicon glyphicon-user"></span></a>
+            </div>
+            <div class="menu-item credits">
+                <div data-ng-bind="profile.credits.worst" class="credit credit-worstEver"></div>
+                <div data-ng-bind="profile.credits.bad" class="credit credit-crap"></div>
+                <div data-ng-bind="profile.credits.good" class="credit credit-awesome"></div>
+                <div data-ng-bind="profile.credits.best" class="credit credit-legendary"></div>
+            </div>
+        </div>
+    </div>
 
 </div>
