@@ -1,31 +1,24 @@
-<section data-ng-controller="RatingsController">
-    <div class="page-header">
-        <h1>Ratings</h1>
-    </div>
-    <div class="col-md-12">
-        <div class="form-group">
-            <label for="subject">Subject</label>
-            <!--<input id="subject" type="text" class="form-control" data-ng-model="selectedSubject" data-ng-options="subject._id as subject.name for subject in subjects" placeholder="Enter subject" bs-typeahead />-->
-            <input id="subject" type="text" class="form-control" data-ng-model="name" placeholder="Enter subject"/>
-        </div>
-        <div class="form-group">
-            <label for="type">Rating:</label>
-            <select id="type" data-ng-model="type" class="form-control">
-                <option value="best">Legendary</option>
-                <option value="good">Awesome</option>s
-                <option value="bad">Crap</option>
-                <option value="worst">Worst ever</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="comment">Comment:</label>
-            <textarea id="comment" data-ng-model="comment" class="form-control" cols="30" rows="4" placeholder="Max 250 characters"></textarea>
-        </div>
-        <div class="form-group">
-            <span>{{error}}</span>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-default" ng-click="createNewRating()">Let it be known</button>
-        </div>
+<section class="container content" data-ng-controller="RatingsController">
+    <div class="row">
+        <div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1 elevated">
+            <div class="page-header">
+                <h1>Ratings</h1>
+            </div>
+            <ul class="list-group" data-ng-init="getAllSubject()">
+                <li class="list-group-item" ng-repeat="subject in subjects">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <span data-ng-bind="subject.name"></span>
+                        </div>
+                        <div class="col-md-4 text-align-right">
+                            <span class="btn-a btn-a-worstEver" data-ng-bind="subject.ratings.worst"></span>
+                            <span class="btn-a btn-a-crap" data-ng-bind="subject.ratings.bad"></span>
+                            <span class="btn-a btn-a-awesome" data-ng-bind="subject.ratings.good"></span>
+                            <span class="btn-a btn-a-legendary" data-ng-bind="subject.ratings.best"></span>
+                        </div>
+                    </div>
+
+                </li>
+            </ul>
     </div>
 </section>

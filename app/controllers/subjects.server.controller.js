@@ -6,7 +6,11 @@
 var mongoose = require('mongoose'),
     errorHandler = require('./errors.server.controller'),
     Subject = mongoose.model('Subject'),
+    ratings = require('../../app/controllers/ratings.server.controller'),
+    async = require('async'),
     _ = require('lodash');
+
+
 
 var create = function(name, user, callback){
 
@@ -117,7 +121,20 @@ var getAllREST = function(req, res) {
                 message: errorHandler.getErrorMessage(err)
             });
         } else {
-            res.jsonp(subjects);
+            async.each(subjects, function(subject, callback){
+                ratings.getAllRatingsCountBySubject(subject, function(err, ratingsCount){
+                    subject._doc.ratings = ratingsCount;
+                    callback(err, subject);
+                });
+            }, function(err){
+                if (err) {
+                    return res.status(400).send({
+                        message: errorHandler.getErrorMessage(err)
+                    });
+                } else {
+                    res.jsonp(subjects);
+                }
+            });
         }
     });
 };

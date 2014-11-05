@@ -6,6 +6,7 @@
 var mongoose = require('mongoose'),
     errorHandler = require('./errors.server.controller'),
     Rating = mongoose.model('Rating'),
+    async = require('async'),
     _ = require('lodash');
 
 var create = function(type, comment, subject, user, callback){
@@ -15,7 +16,6 @@ var create = function(type, comment, subject, user, callback){
     rating.comment = comment;
     rating.subject = subject;
     rating.user = user;
-
 
     rating.save(function(err) {
         callback(err, rating);
@@ -52,6 +52,44 @@ var getById = function(id, callback){
             callback(err, ratings);
         });
 };
+
+
+var getRatingCountBySubjectAndType = function(subject, type, callback){
+    Rating
+        .count({subject: subject, type: type}, function(err, count) {
+            callback(err, count);
+        });
+};
+
+var getAllRatingsCountBySubject = function(subject, callback) {
+    async.series([
+            function(callback){
+                getRatingCountBySubjectAndType(subject, 'worst', callback);
+            },
+            function(callback){
+                getRatingCountBySubjectAndType(subject, 'bad', callback);
+            },
+            function(callback){
+                getRatingCountBySubjectAndType(subject, 'good', callback);
+            },
+            function(callback){
+                getRatingCountBySubjectAndType(subject, 'best', callback);
+            }
+        ],
+        function(err, results){
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, {
+                    worst: results[0],
+                    bad: results[1],
+                    good: results[2],
+                    best: results[3]
+                });
+            }
+        });
+};
+
 
 var checkAuthorization = function(user, rating) {
     return (user.id !== rating.user.id);
@@ -120,6 +158,18 @@ var getAllREST = function(req, res) {
     });
 };
 
+var getCountBySubjectREST = function(req, res) {
+    getAllRatingsCountBySubject(req.subject, function(err, ratingsCount) {
+            if (err) {
+                return res.status(400).send({
+                    message: errorHandler.getErrorMessage(err)
+                });
+            } else {
+                res.jsonp(ratingsCount);
+            }
+        });
+};
+
 var getByIdREST = function(req, res, next, id) {
     getById(id, function(err, rating) {
         if (err) {
@@ -151,12 +201,15 @@ module.exports = {
         read: readREST,
         getAll: getAllREST,
         getById: getByIdREST,
-        checkAuthorization: checkAuthorizationREST
+        checkAuthorization: checkAuthorizationREST,
+        getCountBySubjectREST: getCountBySubjectREST
     },
     create: create,
     update: update,
     remove: remove,
     getAll: getAll,
     getById: getById,
-    checkAuthorization: checkAuthorization
+    checkAuthorization: checkAuthorization,
+    getRatingCountBySubjectAndType: getRatingCountBySubjectAndType,
+    getAllRatingsCountBySubject:  getAllRatingsCountBySubject
 };

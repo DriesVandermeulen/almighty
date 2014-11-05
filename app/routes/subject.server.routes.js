@@ -4,7 +4,8 @@
  * Module dependencies.
  */
 var users = require('../../app/controllers/users.server.controller'),
-    subjects = require('../../app/controllers/subjects.server.controller');
+    subjects = require('../../app/controllers/subjects.server.controller'),
+    ratings = require('../../app/controllers/ratings.server.controller');
 
 module.exports = function(app) {
     // Subject Routes
@@ -16,6 +17,9 @@ module.exports = function(app) {
         .get(users.requiresLogin, subjects.REST.read)
         .put(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.update)
         .delete(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.remove);
+
+    app.route('/subjects/:subjectId/ratings/count')
+        .get(users.requiresLogin, ratings.REST.getCountBySubjectREST);
 
     app.route('/subjects/:subjectName')
         .get(users.requiresLogin, subjects.REST.read)

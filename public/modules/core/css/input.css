@@ -7,6 +7,11 @@
     box-shadow: 0 0 2px #c9c9c9;
 }
 
+button:focus {
+    border-color: #bbb;
+    box-shadow: 0 0 2px #c9c9c9;
+}
+
 .btn {
     box-shadow: none;
 }
@@ -29,6 +34,14 @@
 .btn-a:hover {
     color: #fff;
     text-decoration: none;
+}
+
+.btn-a-full {
+    width: 100%;
+}
+
+.btn-a-selected{
+    padding-bottom: 20px;
 }
 
 .btn-a-big {

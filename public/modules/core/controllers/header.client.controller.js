@@ -26,6 +26,9 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
             $scope.getProfile();
         }
 
+        $scope.newRating =function(){
+            $location.path('/ratings/new');
+        };
 
 	}
 ]);

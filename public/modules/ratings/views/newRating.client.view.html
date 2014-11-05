@@ -1,0 +1,41 @@
+<section class="container content" data-ng-controller="RatingsController">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3 elevated">
+            <div class="page-header">
+                <h1>Let the world know</h1>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input id="subject" type="text" class="form-control" data-ng-model="name" placeholder="Enter subject"/>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <button class="btn-a btn-a-full" ng-class="{'btn-a-worstEver':(selectedType==='worst')}" data-ng-click="setSelectedType('worst')">Worst ever</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn-a btn-a-full" ng-class="{'btn-a-crap':(selectedType==='bad')}" data-ng-click="selectedType='bad'">Crap</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn-a btn-a-full" ng-class="{'btn-a-awesome':(selectedType==='good')}" data-ng-click="selectedType='good'">Awesome</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn-a btn-a-full" ng-class="{'btn-a-legendary':(selectedType==='best')}" data-ng-click="selectedType='best'">Legendary</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="comment">Comment:</label>
+                    <textarea id="comment" data-ng-model="comment" class="form-control" cols="30" rows="4" placeholder="Max 250 characters"></textarea>
+                </div>
+                <div class="form-group">
+                    <span>{{error}}</span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn-a btn-a-full" ng-click="createNewRating()">Let it be known</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

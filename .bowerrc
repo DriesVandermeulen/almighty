@@ -1,3 +1,7 @@
 {
-	"directory": "public/lib"
+	"directory": "public/lib",
+    "registry": "http://bower.herokuapp.com",
+    "proxy": "http://proxy.austin.hp.com:8080",
+    "https-proxy": "https//proxy.austin.hp.com:8080",
+    "strict-ssl": false
 }

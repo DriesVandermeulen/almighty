@@ -184,8 +184,8 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 ]);
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', '$stateParams', '$location', 'Authentication', 'Api',
-	function($scope, $stateParams, $location, Authentication, Api) {
+angular.module('core').controller('HeaderController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Api',
+	function($scope, $stateParams, $location, $http, Authentication, Api) {
 		$scope.authentication = Authentication;
 		$scope.isCollapsed = false;
 
@@ -193,18 +193,27 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};
 
+        $scope.getProfile = function() {
+            $http.get('/users/me/profile').success(function(response) {
+                $scope.profile = response;
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
 		// Collapsing the menu after navigation
 		$scope.$on('$stateChangeSuccess', function() {
 			$scope.isCollapsed = false;
 		});
 
-        $scope.getProfile = function() {
-            if($scope.authentication.user){
-                $scope.profile = Api.Profile.get({
-                    profileId: $scope.authentication.user
-                });
-            }
-        };
+        if ($scope.authentication.user){
+            $scope.getProfile();
+        }
+
+        $scope.newRating =function(){
+            $location.path('/ratings/new');
+        }
+
 	}
 ]);
 'use strict';
@@ -397,6 +406,10 @@ angular.module('ratings').config(['$stateProvider',
         // Ratings state routing
         $stateProvider.
             state('ratings', {
+                url: '/ratings/new',
+                templateUrl: 'modules/ratings/views/newRating.client.view.html'
+            })
+            .state('ratings', {
                 url: '/ratings',
                 templateUrl: 'modules/ratings/views/ratings.client.view.html'
             });
@@ -409,6 +422,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
         $scope.authentication = Authentication;
 
         $scope.error = 'No error';
+        $scope.selectedType = ''
 
         $scope.createNewRating = function(){
 
@@ -421,7 +435,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
             newSubject.$save(function(response) {
 
                 var newRating = new Api.Ratings({
-                    type: $scope.type,
+                    type: $scope.selectedType,
                     comment:  $scope.comment,
                     subject:  response._id
                 });
@@ -431,6 +445,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
 
                 newRating.$save(function(response) {
                     $scope.error = 'success';
+                    $location.path('/ratings');
                 }, function(errorResponse) {
                     $scope.error = errorResponse.data.message;
                 });
@@ -479,6 +494,11 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
         $scope.getAllSubject = function() {
             $scope.subjects = Api.Subjects.query();
         };
+
+        $scope.setSelectedType = function(type){
+            $scope.selectedType = type;
+        }
+
     }
 ]);
 'use strict';

@@ -1,10 +1,11 @@
 'use strict';
 
-angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location','Authentication', 'Api',
-    function($scope, $stateParams, $location, Authentication, Api) {
+angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$stateParams', '$location','Authentication', 'Api',
+    function($scope, $http, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
         $scope.error = 'No error';
+        $scope.selectedType = '';
 
         $scope.createNewRating = function(){
 
@@ -17,7 +18,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
             newSubject.$save(function(response) {
 
                 var newRating = new Api.Ratings({
-                    type: $scope.type,
+                    type: $scope.selectedType,
                     comment:  $scope.comment,
                     subject:  response._id
                 });
@@ -27,6 +28,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
 
                 newRating.$save(function(response) {
                     $scope.error = 'success';
+                    $location.path('/ratings');
                 }, function(errorResponse) {
                     $scope.error = errorResponse.data.message;
                 });
@@ -70,10 +72,26 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
             $scope.rating = Api.Ratings.get({
                 ratingId: $stateParams.ratingId
             });
+
+            $scope.rating.$promise.then(function (result) {
+                $http.get('/subjects/' + result._id + '/ratings/count').success(function(response) {
+                    result.ratings = response  ;
+                });
+            });
         };
 
         $scope.getAllSubject = function() {
             $scope.subjects = Api.Subjects.query();
+
+            $scope.subjects.$promise.then(function (result) {
+                $scope.subjects = result;
+            });
+
         };
+
+        $scope.setSelectedType = function(type){
+            $scope.selectedType = type;
+        };
+
     }
 ]);
