@@ -41,6 +41,11 @@
 .text-align-right{ text-align: right;}
 .text-align-center{ text-align: center;}
 
+:focus {
+    outline-color: transparent;
+    outline-style: none;
+}
+
 hr {
     margin: 30px 0;
 }
@@ -53,13 +58,10 @@ hr {
 
 }
 
-.logo{
-}
-
 .logo img{
     width: 40px;
     height: 40px;
-    margin: 20px 40px;
+    margin: 10px 40px;
 }
 
 .header-menu{
@@ -68,7 +70,7 @@ hr {
 
 .header-menu .menu-item{
     display: inline-block;
-    margin: 20px 0;
+    margin: 10px 0;
     padding:0 20px;
     vertical-align: top;
     border-right: 1px solid #eee;

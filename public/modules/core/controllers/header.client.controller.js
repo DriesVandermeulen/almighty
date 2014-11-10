@@ -5,12 +5,27 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 		$scope.authentication = Authentication;
 		$scope.isCollapsed = false;
 
+        $scope.path = {
+            newRating : function() {
+                $location.path('/ratings/new');
+            },
+            myRatings : function() {
+                $location.path('/me/ratings');
+            },
+            ratings : function() {
+                $location.path('/ratings');
+            },
+            home : function() {
+                $location.path('/');
+            }
+        };
+
 		$scope.toggleCollapsibleMenu = function() {
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};
 
         $scope.getProfile = function() {
-            $http.get('/users/me/profile').success(function(response) {
+            $http.get('/me/profile').success(function(response) {
                 $scope.profile = response;
             }).error(function(response) {
                 $scope.error = response.message;
@@ -28,6 +43,10 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 
         $scope.newRating =function(){
             $location.path('/ratings/new');
+        };
+
+        $scope.myRatings =function(){
+            $location.path('/me/ratings');
         };
 
 	}

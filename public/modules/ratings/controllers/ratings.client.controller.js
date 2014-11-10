@@ -4,35 +4,22 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
     function($scope, $http, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
-        $scope.error = 'No error';
         $scope.selectedType = '';
 
         $scope.createNewRating = function(){
 
-            var newSubject = new Api.Subjects({
-                name: $scope.name
+            var newRating = new Api.Ratings({
+                type: $scope.selectedType,
+                comment:  $scope.comment,
+                subjectName: $scope.name
             });
 
+            $scope.selectedType = '';
+            $scope.comment = '';
             $scope.name = '';
 
-            newSubject.$save(function(response) {
-
-                var newRating = new Api.Ratings({
-                    type: $scope.selectedType,
-                    comment:  $scope.comment,
-                    subject:  response._id
-                });
-
-                $scope.type = '';
-                $scope.comment = '';
-
-                newRating.$save(function(response) {
-                    $scope.error = 'success';
-                    $location.path('/ratings');
-                }, function(errorResponse) {
-                    $scope.error = errorResponse.data.message;
-                });
-
+            newRating.$save(function(response) {
+                $location.path('/ratings');
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
             });
@@ -68,6 +55,14 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
             $scope.ratings = Api.Ratings.query();
         };
 
+        $scope.getAllRatingsFromUser = function() {
+            $http.get('/me/ratings').success(function(ratings) {
+                $scope.ratings = ratings;
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
         $scope.findOne = function() {
             $scope.rating = Api.Ratings.get({
                 ratingId: $stateParams.ratingId
@@ -80,7 +75,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
             });
         };
 
-        $scope.getAllSubject = function() {
+        $scope.getAllSubjects = function() {
             $scope.subjects = Api.Subjects.query();
 
             $scope.subjects.$promise.then(function (result) {

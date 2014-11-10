@@ -6,7 +6,7 @@
 var mongoose = require('mongoose'),
     errorHandler = require('./errors.server.controller'),
     Subject = mongoose.model('Subject'),
-    ratings = require('../../app/controllers/ratings.server.controller'),
+    ratings = require('./ratings.server.controller'),
     async = require('async'),
     _ = require('lodash');
 

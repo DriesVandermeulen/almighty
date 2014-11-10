@@ -194,7 +194,7 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 		};
 
         $scope.getProfile = function() {
-            $http.get('/users/me/profile').success(function(response) {
+            $http.get('/me/profile').success(function(response) {
                 $scope.profile = response;
             }).error(function(response) {
                 $scope.error = response.message;
@@ -212,7 +212,7 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 
         $scope.newRating =function(){
             $location.path('/ratings/new');
-        }
+        };
 
 	}
 ]);
@@ -404,52 +404,44 @@ angular.module('ratings').run(['Menus',
 angular.module('ratings').config(['$stateProvider',
     function($stateProvider) {
         // Ratings state routing
-        $stateProvider.
-            state('ratings', {
-                url: '/ratings/new',
-                templateUrl: 'modules/ratings/views/newRating.client.view.html'
+        $stateProvider
+            .state('me-ratings', {
+                url: '/me/ratings',
+                templateUrl: 'modules/ratings/views/me-ratings.client.view.html'
             })
             .state('ratings', {
                 url: '/ratings',
                 templateUrl: 'modules/ratings/views/ratings.client.view.html'
+            })
+            .state('ratings-new', {
+                url: '/ratings/new',
+                templateUrl: 'modules/ratings/views/ratings-new.client.view.html'
             });
+
     }
 ]);
 'use strict';
 
-angular.module('ratings').controller('RatingsController', ['$scope', '$stateParams', '$location','Authentication', 'Api',
-    function($scope, $stateParams, $location, Authentication, Api) {
+angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$stateParams', '$location','Authentication', 'Api',
+    function($scope, $http, $stateParams, $location, Authentication, Api) {
         $scope.authentication = Authentication;
 
-        $scope.error = 'No error';
-        $scope.selectedType = ''
+        $scope.selectedType = '';
 
         $scope.createNewRating = function(){
 
-            var newSubject = new Api.Subjects({
-                name: $scope.name
+            var newRating = new Api.Ratings({
+                type: $scope.selectedType,
+                comment:  $scope.comment,
+                subjectName: $scope.name
             });
 
+            $scope.selectedType = '';
+            $scope.comment = '';
             $scope.name = '';
 
-            newSubject.$save(function(response) {
-
-                var newRating = new Api.Ratings({
-                    type: $scope.selectedType,
-                    comment:  $scope.comment,
-                    subject:  response._id
-                });
-
-                $scope.type = '';
-                $scope.comment = '';
-
-                newRating.$save(function(response) {
-                    $scope.error = 'success';
-                    $location.path('/ratings');
-                }, function(errorResponse) {
-                    $scope.error = errorResponse.data.message;
-                });
-
+            newRating.$save(function(response) {
+                $location.path('/ratings');
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
             });
@@ -485,19 +477,38 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$statePara
             $scope.ratings = Api.Ratings.query();
         };
 
+        $scope.getAllRatingsFromUser = function() {
+            $http.get('/me/ratings').success(function(ratings) {
+                $scope.ratings = ratings;
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
         $scope.findOne = function() {
             $scope.rating = Api.Ratings.get({
                 ratingId: $stateParams.ratingId
             });
+
+            $scope.rating.$promise.then(function (result) {
+                $http.get('/subjects/' + result._id + '/ratings/count').success(function(response) {
+                    result.ratings = response  ;
+                });
+            });
         };
 
-        $scope.getAllSubject = function() {
+        $scope.getAllSubjects = function() {
             $scope.subjects = Api.Subjects.query();
+
+            $scope.subjects.$promise.then(function (result) {
+                $scope.subjects = result;
+            });
+
         };
 
         $scope.setSelectedType = function(type){
             $scope.selectedType = type;
-        }
+        };
 
     }
 ]);
@@ -509,8 +520,7 @@ angular.module('ratings').factory('Api', ['$resource',
 
         return {
             Ratings: $resource('ratings/:ratingId', {ratingId: '@_id'}, {update: {method: 'PUT'}}),
-            Subjects:  $resource('subjects/:subjectId', {subjectId: '@_id'},{update: {method: 'PUT'}}),
-            Profiles:  $resource('profiles/:profileId', {profileId: '@_id'},{update: {method: 'PUT'}})
+            Subjects:  $resource('subjects/:subjectId', {subjectId: '@_id'},{update: {method: 'PUT'}})
         };
     }
 ]);
@@ -621,6 +631,15 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 				$scope.error = response.message;
 			});
 		};
+
+        $scope.signout = function() {
+            $http.get('/auth/signout').success(function(response) {
+                $scope.authentication.user = null;
+                $location.path('/');
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
 
         function validateCredential(){
             if(! $scope.credentials){

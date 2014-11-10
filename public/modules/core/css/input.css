@@ -28,7 +28,6 @@ button:focus {
     background: #B8AE9C;
     display: inline-block;
     text-decoration: none;
-    font-weight:bold;
 }
 
 .btn-a:hover {

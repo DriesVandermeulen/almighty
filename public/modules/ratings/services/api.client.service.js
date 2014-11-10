@@ -6,8 +6,7 @@ angular.module('ratings').factory('Api', ['$resource',
 
         return {
             Ratings: $resource('ratings/:ratingId', {ratingId: '@_id'}, {update: {method: 'PUT'}}),
-            Subjects:  $resource('subjects/:subjectId', {subjectId: '@_id'},{update: {method: 'PUT'}}),
-            Profiles:  $resource('profiles/:profileId', {profileId: '@_id'},{update: {method: 'PUT'}})
+            Subjects:  $resource('subjects/:subjectId', {subjectId: '@_id'},{update: {method: 'PUT'}})
         };
     }
 ]);

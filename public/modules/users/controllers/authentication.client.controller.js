@@ -35,6 +35,15 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 			});
 		};
 
+        $scope.signout = function() {
+            $http.get('/auth/signout').success(function(response) {
+                $scope.authentication.user = null;
+                $location.path('/');
+            }).error(function(response) {
+                $scope.error = response.message;
+            });
+        };
+
         function validateCredential(){
             if(! $scope.credentials){
                 $scope.error = 'Pleas fill in the required credentials.';
