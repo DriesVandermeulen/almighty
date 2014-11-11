@@ -12,7 +12,7 @@ module.exports = function(app) {
         .get(users.requiresLogin, ratings.REST.getAll)
         .post(users.requiresLogin, ratings.REST.create);
 
-    app.route('/me/ratings')
+    app.route('/users/me/ratings')
         .get(users.requiresLogin, ratings.REST.getAllRatingsByUser);
 
     app.route('/ratings/:ratingId')

@@ -1,0 +1,42 @@
+<div>
+    <div class="modal-header">
+        <h3 class="modal-title">Judge the world</h3>
+    </div>
+    <div class="modal-body">
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <input id="subject" type="text" class="form-control" data-ng-model="name" placeholder="Enter subject"/>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <button class="btn btn-full" data-ng-class="{'btn-a-worstEver':(selectedType==='worst'),'btn-a-border-worstEver':(selectedType!=='worst')}" data-ng-click="setSelectedType('worst')">Worst ever</button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-full" data-ng-class="{'btn-a-crap':(selectedType==='bad'),'btn-a-border-crap':(selectedType!=='bad')}" data-ng-click="selectedType='bad'">Crap</button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-full" data-ng-class="{'btn-a-awesome':(selectedType==='good'),'btn-a-border-awesome':(selectedType!=='good')}" data-ng-click="selectedType='good'">Awesome</button>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-full" data-ng-class="{'btn-a-legendary':(selectedType==='best'),'btn-a-border-legendary':(selectedType!=='best')}" data-ng-click="selectedType='best'">Legendary</button>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="comment">Comment</label>
+            <textarea id="comment" data-ng-model="comment" class="form-control" cols="30" rows="4" placeholder="Max 250 characters"></textarea>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <div class="form-group">
+            <div data-ng-show="error" class="alert alert-danger text-align-left">
+                <strong data-ng-bind="error"></strong>
+            </div>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-a" data-ng-click="cancel()">Cancel</button>
+            <button type="submit" class="btn btn-a-legendary" data-ng-click="create()">Let it be known</button>
+        </div>
+    </div>
+</div>

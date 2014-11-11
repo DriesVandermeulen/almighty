@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$stateParams', '$location','Authentication', 'Api',
-    function($scope, $http, $stateParams, $location, Authentication, Api) {
+angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$stateParams', '$location', '$modal', 'Authentication', 'Api',
+    function($scope, $http, $stateParams, $location, $modal, Authentication, Api) {
         $scope.authentication = Authentication;
 
         $scope.selectedType = '';
@@ -56,7 +56,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
         };
 
         $scope.getAllRatingsFromUser = function() {
-            $http.get('/me/ratings').success(function(ratings) {
+            $http.get('/users/me/ratings').success(function(ratings) {
                 $scope.ratings = ratings;
             }).error(function(response) {
                 $scope.error = response.message;

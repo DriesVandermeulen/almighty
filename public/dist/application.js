@@ -189,12 +189,27 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 		$scope.authentication = Authentication;
 		$scope.isCollapsed = false;
 
+        $scope.path = {
+            newRating : function() {
+                $location.path('/ratings/new');
+            },
+            myRatings : function() {
+                $location.path('/users/me/ratings');
+            },
+            ratings : function() {
+                $location.path('/ratings');
+            },
+            home : function() {
+                $location.path('/');
+            }
+        };
+
 		$scope.toggleCollapsibleMenu = function() {
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};
 
         $scope.getProfile = function() {
-            $http.get('/me/profile').success(function(response) {
+            $http.get('users/me/profile').success(function(response) {
                 $scope.profile = response;
             }).error(function(response) {
                 $scope.error = response.message;
@@ -212,6 +227,10 @@ angular.module('core').controller('HeaderController', ['$scope', '$stateParams',
 
         $scope.newRating =function(){
             $location.path('/ratings/new');
+        };
+
+        $scope.myRatings =function(){
+            $location.path('/me/ratings');
         };
 
 	}
@@ -406,7 +425,7 @@ angular.module('ratings').config(['$stateProvider',
         // Ratings state routing
         $stateProvider
             .state('me-ratings', {
-                url: '/me/ratings',
+                url: '/users/me/ratings',
                 templateUrl: 'modules/ratings/views/me-ratings.client.view.html'
             })
             .state('ratings', {
@@ -420,10 +439,26 @@ angular.module('ratings').config(['$stateProvider',
 
     }
 ]);
+angular.module('ratings').controller('newRatingModelController', ['$scope', '$modalInstance', 'items',
+    function ($scope, $modalInstance, items) {
+        $scope.items = items;
+        $scope.selected = {
+            item: $scope.items[0]
+        };
+
+        $scope.ok = function () {
+            $modalInstance.close($scope.selected.item);
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+    }
+]);
 'use strict';
 
-angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$stateParams', '$location','Authentication', 'Api',
-    function($scope, $http, $stateParams, $location, Authentication, Api) {
+angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$stateParams', '$location', '$modal', 'Authentication', 'Api',
+    function($scope, $http, $stateParams, $location, $modal, Authentication, Api) {
         $scope.authentication = Authentication;
 
         $scope.selectedType = '';
@@ -444,6 +479,25 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
                 $location.path('/ratings');
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
+            });
+        };
+
+        $scope.openNewRatingModel = function (size) {
+            var modalInstance = $modal.open({
+                templateUrl: 'modules/ratings/views/models/newRating.model.client.view.html',
+                controller: 'newRatingModelController',
+                size: size,
+                resolve: {
+                    items: function () {
+                        return $scope.items;
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (selectedItem) {
+                $scope.selected = selectedItem;
+            }, function () {
+
             });
         };
 
@@ -478,7 +532,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
         };
 
         $scope.getAllRatingsFromUser = function() {
-            $http.get('/me/ratings').success(function(ratings) {
+            $http.get('/users/me/ratings').success(function(ratings) {
                 $scope.ratings = ratings;
             }).error(function(response) {
                 $scope.error = response.message;

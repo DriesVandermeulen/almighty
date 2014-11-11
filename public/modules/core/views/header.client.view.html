@@ -1,27 +1,31 @@
-<div class="header elevated" data-ng-controller="HeaderController" data-ng-show="authentication.user">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="logo">
-                <a data-ng-click="path.home()"><img src="modules/core/img/brand/cloud.svg"></a>
+<div data-ng-controller="HeaderController" >
+    <div class="header elevated" data-ng-show="authentication.user">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="logo">
+                    <a data-ng-click="path.home()"><img src="modules/core/img/brand/cloud.svg"></a>
+                </div>
             </div>
-        </div>
-        <div class="col-md-6 header-menu">
-            <div class="menu-item">
-                <a href="#" data-ng-click="path.newRating()"><span class="icon glyphicon glyphicon-plus"></span></a>
-            </div>
-            <div class="menu-item">
-                <a href="#"><span class="icon glyphicon glyphicon-user" data-ng-click="path.myRatings()"></span></a>
-            </div>
-            <div class="menu-item" data-ng-controller="AuthenticationController">
-                <a href="#"><span class="icon glyphicon glyphicon-log-out" data-ng-click="signout()"></span></a>
-            </div>
-            <div class="menu-item credits">
-                <div data-ng-bind="profile.credits.worst" class="credit credit-worstEver"></div>
-                <div data-ng-bind="profile.credits.bad" class="credit credit-crap"></div>
-                <div data-ng-bind="profile.credits.good" class="credit credit-awesome"></div>
-                <div data-ng-bind="profile.credits.best" class="credit credit-legendary"></div>
+            <div class="col-md-6 header-menu">
+                <div class="menu-item">
+                    <a href="#" data-ng-click="openNewRatingModel()"><span class="icon glyphicon glyphicon-plus"></span></a>
+                </div>
+                <div class="menu-item">
+                    <a href="#"><span class="icon glyphicon glyphicon-user" data-ng-click="path.myRatings()"></span></a>
+                </div>
+                <div class="menu-item" data-ng-controller="AuthenticationController">
+                    <a href="#"><span class="icon glyphicon glyphicon-log-out" data-ng-click="signout()"></span></a>
+                </div>
+                <div class="menu-item credits">
+                    <div data-ng-bind="profile.credits.worst" class="credit credit-worstEver"></div>
+                    <div data-ng-bind="profile.credits.bad" class="credit credit-crap"></div>
+                    <div data-ng-bind="profile.credits.good" class="credit credit-awesome"></div>
+                    <div data-ng-bind="profile.credits.best" class="credit credit-legendary"></div>
+                </div>
             </div>
         </div>
     </div>
-
+    <div class="notifications">
+        <alert ng-repeat="notification in notifications" type="{{notification.type}}" close="closeNotification($index)" class="notification elevated">{{notification.msg}}</alert>
+    </div>
 </div>

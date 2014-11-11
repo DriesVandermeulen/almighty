@@ -12,16 +12,16 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-3">
-                            <button class="btn-a btn-a-full" ng-class="{'btn-a-worstEver':(selectedType==='worst')}" data-ng-click="setSelectedType('worst')">Worst ever</button>
+                            <button class="btn btn-full" ng-class="{'btn-a-worstEver':(selectedType==='worst'),'btn-a-border-worstEver':(selectedType!=='worst')}" data-ng-click="setSelectedType('worst')">Worst ever</button>
                         </div>
                         <div class="col-md-3">
-                            <button class="btn-a btn-a-full" ng-class="{'btn-a-crap':(selectedType==='bad')}" data-ng-click="selectedType='bad'">Crap</button>
+                            <button class="btn btn-full" ng-class="{'btn-a-crap':(selectedType==='bad'),'btn-a-border-crap':(selectedType!=='bad')}" data-ng-click="selectedType='bad'">Crap</button>
                         </div>
                         <div class="col-md-3">
-                            <button class="btn-a btn-a-full" ng-class="{'btn-a-awesome':(selectedType==='good')}" data-ng-click="selectedType='good'">Awesome</button>
+                            <button class="btn btn-full" ng-class="{'btn-a-awesome':(selectedType==='good'),'btn-a-border-awesome':(selectedType!=='good')}" data-ng-click="selectedType='good'">Awesome</button>
                         </div>
                         <div class="col-md-3">
-                            <button class="btn-a btn-a-full" ng-class="{'btn-a-legendary':(selectedType==='best')}" data-ng-click="selectedType='best'">Legendary</button>
+                            <button class="btn btn-full" ng-class="{'btn-a-legendary':(selectedType==='best'),'btn-a-border-legendary':(selectedType!=='best')}" data-ng-click="selectedType='best'">Legendary</button>
                         </div>
                     </div>
                 </div>
@@ -35,7 +35,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn-a btn-a-full" ng-click="createNewRating()">Let it be known</button>
+                    <button type="submit" class="btn btn-a btn-a-full" ng-click="createNewRating()">Let it be known</button>
                 </div>
             </div>
         </div>

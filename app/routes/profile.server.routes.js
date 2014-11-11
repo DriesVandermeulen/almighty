@@ -8,7 +8,7 @@ var users = require('../../app/controllers/users.server.controller'),
 
 module.exports = function(app) {
 
-    app.route('/me/profile')
+    app.route('/users/me/profile')
         .get(users.requiresLogin, profiles.REST.getByUser);
 
 };

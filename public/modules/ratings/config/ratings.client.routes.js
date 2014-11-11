@@ -6,7 +6,7 @@ angular.module('ratings').config(['$stateProvider',
         // Ratings state routing
         $stateProvider
             .state('me-ratings', {
-                url: '/me/ratings',
+                url: '/users/me/ratings',
                 templateUrl: 'modules/ratings/views/me-ratings.client.view.html'
             })
             .state('ratings', {

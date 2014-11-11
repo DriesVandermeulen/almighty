@@ -7,60 +7,91 @@
     box-shadow: 0 0 2px #c9c9c9;
 }
 
-button:focus {
-    border-color: #bbb;
-    box-shadow: 0 0 2px #c9c9c9;
+:focus {
+    outline: transparent none;
 }
 
 .btn {
     box-shadow: none;
-}
-
-.btn-a {
     white-space: nowrap;
-    border: 0;
-    color: #fff;
     font-size: 14px;
-    cursor: pointer;
     font-weight: 400;
     padding: 11px 20px;
+    cursor: pointer;
     position: relative;
-    background: #B8AE9C;
     display: inline-block;
     text-decoration: none;
 }
 
-.btn-a:hover {
-    color: #fff;
-    text-decoration: none;
-}
-
-.btn-a-full {
-    width: 100%;
-}
-
-.btn-a-selected{
-    padding-bottom: 20px;
-}
-
-.btn-a-big {
+.btn-big {
     font-size: 16px;
     font-weight: 800;
     padding: 20px 20px;
 }
 
-.btn-a-legendary {
+.btn-full {
+    width: 100%;
+}
+
+.btn-a {
+    border: 0;
+    color: #fff;
+    background: #a0a0a0;
+}
+
+.btn-a:hover, .btn-a:focus {
+    color: #fff;
+    background: #888;
+    text-decoration: none;
+}
+
+.btn-a-legendary, .btn-a-legendary:hover, .btn-a-legendary:focus  {
     background: #FCB03C;
+    color: #fff;
 }
 
-.btn-a-awesome {
+.btn-a-awesome, .btn-a-awesome:hover, .btn-a-awesome:focus {
     background: #0576AB;
+    color: #fff;
 }
 
-.btn-a-crap {
+.btn-a-crap, .btn-a-crap:hover, .btn-a-crap:focus {
     background: #FC563F;
+    color: #fff;
 }
 
-.btn-a-worstEver {
+.btn-a-worstEver, .btn-a-worstEver:hover, .btn-a-worstEver:focus {
     background: #33363C;
+    color: #fff;
 }
+
+.btn-a-border, .btn-a-border:hover, .btn-a-border:focus  {
+    border: 1px solid #a0a0a0;
+    color: #a0a0a0;;
+    background: #fff;
+}
+
+.btn-a-border-legendary, .btn-a-border-legendary:hover, .btn-a-border-legendary:focus  {
+    border: 1px solid #FCB03C;
+    color: #FCB03C;
+    background: #fff;
+}
+
+.btn-a-border-awesome, .btn-a-border-awesome:hover, .btn-a-border-awesome:focus {
+    border: 1px solid #0576AB;
+    color: #0576AB;
+    background: #fff;
+}
+
+.btn-a-border-crap, .btn-a-border-crap:hover, .btn-a-border-crap:focus {
+    border: 1px solid #FC563F;
+    color: #FC563F;
+    background: #fff;
+}
+
+.btn-a-border-worstEver, .btn-a-border-worstEver:hover, .btn-a-border-worstEver:focus {
+    border: 1px solid #33363C;
+    color: #33363C;
+    background: #fff;
+}
+

@@ -3,6 +3,7 @@
         <div class="col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1 elevated">
             <div class="page-header">
                 <h1>Ratings</h1>
+                <button data-ng-click="openNewRatingModel()">TestModel</button>
             </div>
             <ul class="list-group" data-ng-init="getAllSubjects()">
                 <li class="list-group-item" ng-repeat="subject in subjects">
@@ -11,10 +12,10 @@
                             <span data-ng-bind="subject.name"></span>
                         </div>
                         <div class="col-md-4 text-align-right">
-                            <span class="btn-a btn-a-worstEver" data-ng-bind="subject.ratings.worst"></span>
-                            <span class="btn-a btn-a-crap" data-ng-bind="subject.ratings.bad"></span>
-                            <span class="btn-a btn-a-awesome" data-ng-bind="subject.ratings.good"></span>
-                            <span class="btn-a btn-a-legendary" data-ng-bind="subject.ratings.best"></span>
+                            <span class="btn btn-a btn-a-worstEver" data-ng-bind="subject.ratings.worst"></span>
+                            <span class="btn btn-a btn-a-crap" data-ng-bind="subject.ratings.bad"></span>
+                            <span class="btn btn-a btn-a-awesome" data-ng-bind="subject.ratings.good"></span>
+                            <span class="btn btn-a btn-a-legendary" data-ng-bind="subject.ratings.best"></span>
                         </div>
                     </div>
 
