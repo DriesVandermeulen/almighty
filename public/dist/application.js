@@ -462,6 +462,8 @@ angular.module('ratings').config(['$stateProvider',
 
     }
 ]);
+'use strict';
+
 angular.module('ratings').controller('newRatingModelController', ['$scope', '$rootScope', '$modalInstance', 'Api',
     function ($scope, $rootScope, $modalInstance, Api) {
 
@@ -560,7 +562,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
             });
 
             $scope.rating.$promise.then(function (result) {
-                $http.get('/subjects/' + result._id + '/ratings/count').success(function(response) {
+                $http.get('/subjects/' + result.name + '/ratings/count').success(function(response) {
                     result.ratings = response  ;
                 });
             });
@@ -589,7 +591,7 @@ angular.module('ratings').factory('Api', ['$resource',
 
         return {
             Ratings: $resource('ratings/:ratingId', {ratingId: '@_id'}, {update: {method: 'PUT'}}),
-            Subjects:  $resource('subjects/:subjectId', {subjectId: '@_id'},{update: {method: 'PUT'}})
+            Subjects:  $resource('subjects/:subject', {subject: '@name'},{update: {method: 'PUT'}})
         };
     }
 ]);

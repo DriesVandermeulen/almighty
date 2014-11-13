@@ -6,183 +6,154 @@
 var mongoose = require('mongoose-q')(),
     errorHandler = require('./errors.server.controller'),
     Subject = mongoose.model('Subject'),
-    ratings = require('./ratings.server.controller'),
+    Rating = mongoose.model('Rating'),
     async = require('async'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    Q = require('q');
 
-
-
-var create = function(name, user, callback){
-
-    var subject = new Subject();
-    subject.name = name;
-    subject.user = user;
-
-    subject.save(function(err) {
-        callback(err, subject);
+function returnHTTP400(err, res){
+    return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
     });
-};
+}
 
-var update = function(subject, callback) {
-    subject.save(function(err) {
-        callback(err, subject);
+function returnHTTP403(res){
+    return res.status(403).send({
+        message: 'You are not authorized'
     });
-};
+}
 
-var remove = function(subject, callback) {
-
-    subject.remove(function(err) {
-        callback(err, subject);
+function returnHTTP404(res){
+    return res.status(404).send({
+        message: 'Resource not found'
     });
-};
-
-var getAll = function(callback){
-    Subject
-        .find()
-        .exec(function(err, subjects) {
-            callback(err, subjects);
-        });
-};
-
-var getById = function(id, callback){
-    Subject
-        .findById(id)
-        .exec(function(err, subject) {
-            callback(err, subject);
-        });
-};
-
-var getByName = function(name, callback){
-    Subject
-        .findOne({name: name})
-        .exec(function(err, subject) {
-            callback(err, subject);
-        });
-};
-
-var checkAuthorization = function(user, subject) {
-    return (user.id !== subject.user.id);
-};
+}
 
 var createREST = function(req, res) {
-
-    var name = req.body.name;
-    var user = req.user;
-
-    create(name, user, function(err, subject){
-        if (err) {
-            return res.status(400).send({
-                message: errorHandler.getErrorMessage(err)
-            });
-        }else{
+    var subject = new Subject();
+    subject.name = req.body.name;
+    subject.user = req.user;
+    subject
+        .saveQ()
+        .then(function(subject){
             res.jsonp(subject);
-        }
-    });
+        })
+        .catch(function(err){
+            returnHTTP400(err, res);
+        })
+        .done();
 };
 
 var updateREST = function(req, res) {
-    var subject = req.subject;
-
-    subject = _.extend(subject, req.body);
-
-    update(subject, function(err, subject) {
-        if (err) {
-            return res.status(400).send({
-                message: errorHandler.getErrorMessage(err)
-            });
-        } else {
+    var subject = _.extend(req.subject, req.body);
+    subject
+        .saveQ()
+        .then(function(subject){
             res.jsonp(subject);
-        }
-    });
+        })
+        .catch(function(err){
+            returnHTTP400(err, res);
+        })
+        .done();
 };
 
 var removeREST = function(req, res) {
     var subject = req.subject;
-
-    remove(subject, function(err, subject) {
-        if (err) {
-            return res.status(400).send({
-                message: errorHandler.getErrorMessage(err)
-            });
-        } else {
+    subject
+        .removeQ()
+        .then(function(subject){
             res.jsonp(subject);
-        }
-    });
+        })
+        .catch(function(err){
+            returnHTTP400(err, res);
+        })
+        .done();
 };
 
 var readREST = function(req, res) {
     res.jsonp(req.subject);
 };
 
+var getRatingCount = function(subject, type){
+    return Rating.count({subject: subject, type: type}).execQ();
+};
+
+var getAllRatingsCount = function(subject) {
+    var count = {};
+    return getRatingCount(subject, 'worst')
+        .then(function(value){
+            count.worst = value;
+            return getRatingCount(subject, 'bad');
+        })
+        .then(function(value){
+            count.bad = value;
+            return getRatingCount(subject, 'good');
+        })
+        .then(function(value){
+            count.good = value;
+            return getRatingCount(subject, 'best');
+        })
+        .then(function(value){
+            count.best = value;
+            return count;
+        })
+        .catch(function(err){
+            throw err;
+        });
+};
+
 var getAllREST = function(req, res) {
-    getAll(function(err, subjects) {
-        if (err) {
-            return res.status(400).send({
-                message: errorHandler.getErrorMessage(err)
-            });
-        } else {
+    Subject
+        .find().execQ()
+        .then(function(subjects){
             async.each(subjects, function(subject, callback){
-                ratings.getAllRatingsCountBySubject(subject, function(err, ratingsCount){
-                    subject._doc.ratings = ratingsCount;
-                    callback(err, subject);
-                });
+                getAllRatingsCount(subject)
+                    .then(function(count){
+                        subject._doc.ratings = count;
+                        callback(null, subject);
+                    })
+                    .catch(function(err){
+                        returnHTTP400(err);
+                    })
+                    .done();
             }, function(err){
-                if (err) {
-                    return res.status(400).send({
-                        message: errorHandler.getErrorMessage(err)
-                    });
-                } else {
-                    res.jsonp(subjects);
-                }
+                if (err) returnHTTP400(err);
+                else res.jsonp(subjects);
             });
-        }
+        })
+        .catch(function(err){
+            returnHTTP400(err);
+        });
+};
+
+var isSubjectFound = function(subject){
+    return Q.fcall(function() {
+        if (!subject) throw new Error('Failed to load subject');
+        else return subject;
     });
 };
 
-var getByIdREST = function(req, res, next, id) {
-    Subject.findOne({name: id}).execQ().then(function (subject) {
-        if (!subject) {
-            Subject.findById(id).execQ().then(function (subject) {
-                if (!subject) {
-                    return next(new Error('Failed to load subject ' + id));
-                }
-                req.subject = subject;
-                next();
-            })
-            .catch(function (err) {
-                return next(err);
-            })
-            .done();
-        }else{
+var getREST = function(req, res, next, name) {
+    Subject
+        .findOne({name: name}).execQ()
+        .then(isSubjectFound)
+        .then(function(subject){
             req.subject = subject;
             next();
-        }
-    })
-    .catch(function (err) {
-        return next(err);
-    })
-    .done();
-
+        })
+        .catch(function(){
+            returnHTTP404(res);
+        })
+        .done();
 };
 
-var getByNameREST = function(req, res, next, name) {
-    getByName(name, function(err, subject) {
-        if (err) {
-            return next(err);
-        }
-        if (!subject) {
-            return next(new Error('Failed to load subject ' + name));
-        }
-        req.subject = subject;
-        next();
-    });
-};
+function checkAuthorization(user, subject) {
+    return user.id !== subject.user.id;
+}
 
 var checkAuthorizationREST = function(req, res, next) {
     if (checkAuthorization(req.user, req.subject)) {
-        return res.status(403).send({
-            message: 'User is not authorized'
-        });
+        returnHTTP403(res);
     }
     next();
 };
@@ -194,15 +165,7 @@ module.exports = {
         remove: removeREST,
         read: readREST,
         getAll: getAllREST,
-        getById: getByIdREST,
-        getByName: getByNameREST,
+        get: getREST,
         checkAuthorization: checkAuthorizationREST
-    },
-    create: create,
-    update: update,
-    remove: remove,
-    getAll: getAll,
-    getById: getById,
-    getByName: getByName,
-    checkAuthorization: checkAuthorization
+    }
 };

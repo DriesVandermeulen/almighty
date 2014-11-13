@@ -27,5 +27,5 @@ module.exports = function(app) {
         .delete(users.requiresLogin, users.hasAuthorization(['admin']), subjects.REST.remove);
 
     // Finish by binding the subject middleware
-    app.param('subject', subjects.REST.getById);
+    app.param('subject', subjects.REST.get);
 };

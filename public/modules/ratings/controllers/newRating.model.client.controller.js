@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('ratings').controller('newRatingModelController', ['$scope', '$rootScope', '$modalInstance', 'Api',
     function ($scope, $rootScope, $modalInstance, Api) {
 

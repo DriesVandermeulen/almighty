@@ -69,7 +69,7 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
             });
 
             $scope.rating.$promise.then(function (result) {
-                $http.get('/subjects/' + result._id + '/ratings/count').success(function(response) {
+                $http.get('/subjects/' + result.name + '/ratings/count').success(function(response) {
                     result.ratings = response  ;
                 });
             });
