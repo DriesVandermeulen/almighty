@@ -184,10 +184,33 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 ]);
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', '$stateParams', '$location', '$http', 'Authentication', 'Api',
-	function($scope, $stateParams, $location, $http, Authentication, Api) {
+angular.module('core').controller('HeaderController', ['$scope', '$rootScope', '$stateParams', '$location', '$http', '$modal', 'Authentication', 'Api',
+	function($scope, $rootScope, $stateParams, $location, $http, $modal, Authentication, Api) {
 		$scope.authentication = Authentication;
 		$scope.isCollapsed = false;
+
+        $scope.notifications = [];
+
+        $scope.closeNotification = function(index) {
+            $scope.notifications.splice(index, 1);
+        };
+
+        $scope.openNewRatingModel = function (size) {
+            var modalInstance = $modal.open({
+                templateUrl: 'modules/ratings/views/models/newRating.model.client.view.html',
+                controller: 'newRatingModelController',
+                size: size
+            });
+
+            modalInstance.result.then(function (rating) {
+                $scope.notifications.push({
+                    type: 'success',
+                    msg: 'New rating created!' });
+                $scope.getProfile();
+            }, function () {
+
+            });
+        };
 
         $scope.path = {
             newRating : function() {
@@ -439,19 +462,30 @@ angular.module('ratings').config(['$stateProvider',
 
     }
 ]);
-angular.module('ratings').controller('newRatingModelController', ['$scope', '$modalInstance', 'items',
-    function ($scope, $modalInstance, items) {
-        $scope.items = items;
-        $scope.selected = {
-            item: $scope.items[0]
-        };
-
-        $scope.ok = function () {
-            $modalInstance.close($scope.selected.item);
-        };
+angular.module('ratings').controller('newRatingModelController', ['$scope', '$rootScope', '$modalInstance', 'Api',
+    function ($scope, $rootScope, $modalInstance, Api) {
 
         $scope.cancel = function () {
             $modalInstance.dismiss('cancel');
+        };
+
+        $scope.create = function(){
+
+            var newRating = new Api.Ratings({
+                type: $scope.selectedType,
+                comment:  $scope.comment,
+                subjectName: $scope.name
+            });
+
+            newRating.$save(function(response) {
+                $scope.selectedType = '';
+                $scope.comment = '';
+                $scope.name = '';
+                $rootScope.$emit('ratingCreated', response);
+                $modalInstance.close(response);
+            }, function(errorResponse) {
+                $scope.error = errorResponse.data.message;
+            });
         };
     }
 ]);
@@ -479,25 +513,6 @@ angular.module('ratings').controller('RatingsController', ['$scope', '$http', '$
                 $location.path('/ratings');
             }, function(errorResponse) {
                 $scope.error = errorResponse.data.message;
-            });
-        };
-
-        $scope.openNewRatingModel = function (size) {
-            var modalInstance = $modal.open({
-                templateUrl: 'modules/ratings/views/models/newRating.model.client.view.html',
-                controller: 'newRatingModelController',
-                size: size,
-                resolve: {
-                    items: function () {
-                        return $scope.items;
-                    }
-                }
-            });
-
-            modalInstance.result.then(function (selectedItem) {
-                $scope.selected = selectedItem;
-            }, function () {
-
             });
         };
 

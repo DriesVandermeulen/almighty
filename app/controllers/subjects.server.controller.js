@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+var mongoose = require('mongoose-q')(),
     errorHandler = require('./errors.server.controller'),
     Subject = mongoose.model('Subject'),
     ratings = require('./ratings.server.controller'),
@@ -140,16 +140,29 @@ var getAllREST = function(req, res) {
 };
 
 var getByIdREST = function(req, res, next, id) {
-    getById(id, function(err, subject) {
-        if (err) {
-            return next(err);
-        }
+    Subject.findOne({name: id}).execQ().then(function (subject) {
         if (!subject) {
-            return next(new Error('Failed to load subject ' + id));
+            Subject.findById(id).execQ().then(function (subject) {
+                if (!subject) {
+                    return next(new Error('Failed to load subject ' + id));
+                }
+                req.subject = subject;
+                next();
+            })
+            .catch(function (err) {
+                return next(err);
+            })
+            .done();
+        }else{
+            req.subject = subject;
+            next();
         }
-        req.subject = subject;
-        next();
-    });
+    })
+    .catch(function (err) {
+        return next(err);
+    })
+    .done();
+
 };
 
 var getByNameREST = function(req, res, next, name) {
